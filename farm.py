@@ -63,6 +63,7 @@ def game_event(code):
     VK_9 = 0x39
 
     code_string = ''.join(filter(str.isdigit, code))
+    code_string = code_string.replace("S","5")
     print("start typing code: [%s]" % code_string)
     time.sleep(2)
 
@@ -94,14 +95,14 @@ def game_event(code):
         ctypes.windll.user32.keybd_event(key_code, 0, 0, 0)
         ctypes.windll.user32.keybd_event(key_code, 0, 2, 0)
     print("done typing")
-    time.sleep(1)
+    time.sleep(2)
     # Press Enter
     ctypes.windll.user32.keybd_event(VK_RETURN, 0, 0, 0)
     ctypes.windll.user32.keybd_event(VK_RETURN, 0, 2, 0)
 
-    # Press Enter
-    ctypes.windll.user32.keybd_event(VK_RETURN, 0, 0, 0)
-    ctypes.windll.user32.keybd_event(VK_RETURN, 0, 2, 0)
+    # # Press Enter
+    # ctypes.windll.user32.keybd_event(VK_RETURN, 0, 0, 0)
+    # ctypes.windll.user32.keybd_event(VK_RETURN, 0, 2, 0)
 
 # set up tesseract OCR engine
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"
