@@ -7,7 +7,7 @@ import ctypes
 
 # Define the key codes for Enter
 VK_F3 = 0x72
-VK_F4 = 0x73
+VK_F5 = 0x74
 
 # define the region of the game window to capture
 game_region = (0, 0, 1360, 768)
@@ -35,8 +35,8 @@ while True:
     if cast_skill is not None:
         print("canceling skill")
         # Press Enter
-        ctypes.windll.user32.keybd_event(VK_F4, 0, 0, 0)
-        ctypes.windll.user32.keybd_event(VK_F4, 0, 2, 0)
+        ctypes.windll.user32.keybd_event(VK_F5, 0, 0, 0)
+        ctypes.windll.user32.keybd_event(VK_F5, 0, 2, 0)
 
     # Press Enter
     ctypes.windll.user32.keybd_event(VK_F3, 0, 0, 0)
