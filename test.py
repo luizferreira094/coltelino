@@ -52,43 +52,45 @@ def game_event(code):
     VK_8 = 0x38
     VK_9 = 0x39
 
+    print(code)
     code = code.replace("S","5")
+    print(code)
     code_string = ''.join(filter(str.isdigit, code))
     print("start typing code: [%s]" % code_string)
     sleep(2)
 
     # Type the input string
-    for char in code_string:
-        print(char)
-        # Convert the character to the corresponding key code
-        if char == '0':
-            key_code = VK_0
-        elif char == '1':
-            key_code = VK_1
-        elif char == '2':
-            key_code = VK_2
-        elif char == '3':
-            key_code = VK_3
-        elif char == '4':
-            key_code = VK_4
-        elif char == '5':
-            key_code = VK_5
-        elif char == '6':
-            key_code = VK_6
-        elif char == '7':
-            key_code = VK_7
-        elif char == '8':
-            key_code = VK_8
-        elif char == '9':
-            key_code = VK_9
-        # Press the key
-        ctypes.windll.user32.keybd_event(key_code, 0, 0, 0)
-        ctypes.windll.user32.keybd_event(key_code, 0, 2, 0)
+    # for char in code_string:
+    #     print(char)
+    #     # Convert the character to the corresponding key code
+    #     if char == '0':
+    #         key_code = VK_0
+    #     elif char == '1':
+    #         key_code = VK_1
+    #     elif char == '2':
+    #         key_code = VK_2
+    #     elif char == '3':
+    #         key_code = VK_3
+    #     elif char == '4':
+    #         key_code = VK_4
+    #     elif char == '5':
+    #         key_code = VK_5
+    #     elif char == '6':
+    #         key_code = VK_6
+    #     elif char == '7':
+    #         key_code = VK_7
+    #     elif char == '8':
+    #         key_code = VK_8
+    #     elif char == '9':
+    #         key_code = VK_9
+    #     # Press the key
+    #     ctypes.windll.user32.keybd_event(key_code, 0, 0, 0)
+    #     ctypes.windll.user32.keybd_event(key_code, 0, 2, 0)
     print("done typing")
     sleep(2)
     # Press Enter
-    ctypes.windll.user32.keybd_event(VK_RETURN, 0, 0, 0)
-    ctypes.windll.user32.keybd_event(VK_RETURN, 0, 2, 0)
+    # ctypes.windll.user32.keybd_event(VK_RETURN, 0, 0, 0)
+    # ctypes.windll.user32.keybd_event(VK_RETURN, 0, 2, 0)
 
     # # Press Enter
     # ctypes.windll.user32.keybd_event(VK_RETURN, 0, 0, 0)
@@ -141,8 +143,8 @@ while True:
         print("Press enter after anti-bot initialized")
 
         # Press Enter
-        ctypes.windll.user32.keybd_event(VK_RETURN, 0, 0, 0)
-        ctypes.windll.user32.keybd_event(VK_RETURN, 0, 2, 0)
+        # ctypes.windll.user32.keybd_event(VK_RETURN, 0, 0, 0)
+        # ctypes.windll.user32.keybd_event(VK_RETURN, 0, 2, 0)
 
         sleep(1)
 
@@ -154,7 +156,7 @@ while True:
 
         # red_extracted = extract_red_colours(popup_np)
 
-        cv2.imwrite('processed_image.jpg', popup_np)
+        # cv2.imwrite('processed_image.jpg', popup_np)
 
         # gray = cv2.cvtColor(popup_np, cv2.COLOR_BGR2GRAY)
 
@@ -166,7 +168,7 @@ while True:
 
         resize = cv2.resize(red, None, fx=15, fy=15, interpolation=cv2.INTER_CUBIC)
 
-        cv2.imwrite('processed_image_number.jpg', resize)
+        # cv2.imwrite('processed_image_number.jpg', resize)
 
         red_text = extract_ocr(resize)
 
@@ -175,10 +177,10 @@ while True:
 
         game_event(red_text)
 
-    skill_key()
-    sleep(0.1)
-    left_click()
-    sleep(0.2)
-    teleport()
+    # skill_key()
+    # sleep(0.1)
+    #left_click()
+    #sleep(0.2)
+    #teleport()
 
     sleep(0.3)
