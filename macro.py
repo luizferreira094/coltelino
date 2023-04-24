@@ -53,6 +53,7 @@ def game_event(code):
     VK_9 = 0x39
 
     code = code.replace("S","5")
+    code = code.replace("?","7")
     code_string = ''.join(filter(str.isdigit, code))
     print("start typing code: [%s]" % code_string)
     sleep(2)
