@@ -10,7 +10,7 @@ VK_F3 = 0x72
 VK_F5 = 0x74
 
 # define the region of the game window to capture
-game_region = (0, 0, 1360, 768)
+# game_region = (0, 0, 1360, 768)
 
 # define the image to search for on the screen
 popup_skill = cv2.imread('summon.png')
@@ -22,7 +22,8 @@ time.sleep(5)
 
 while True:
     # take a screenshot of the game window
-    game_screenshot = pyautogui.screenshot(region=game_region)
+    # game_screenshot = pyautogui.screenshot(region=game_region)
+    game_screenshot = pyautogui.screenshot()
 
     # search for the popup window on the screenshot
     summon_skill = pyautogui.locateOnScreen(popup_skill, confidence=0.5)
