@@ -44,4 +44,4 @@ while True:
     ctypes.windll.user32.keybd_event(VK_F3, 0, 2, 0)
 
     # wait for 1 second before taking the next screenshot
-    time.sleep(0.2)
+    time.sleep(0.1)
