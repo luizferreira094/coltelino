@@ -18,6 +18,9 @@ popup_skill = cv2.imread('summon.png')
 # define the image to search for on the screen
 popup_cast = cv2.imread('cast.png')
 
+# define the wait variable for waiting press button
+wait = False
+
 time.sleep(5)
 
 while True:
@@ -31,7 +34,11 @@ while True:
 
     if summon_skill is not None:
         print("Summon Time! Good Luck!")
-        time.sleep(5)
+        wait = True
+        while (wait):
+            time.sleep(0.1)
+            if pyautogui.locateOnScreen(popup_skill, confidence=0.5) is None:
+                wait = False
     
     if cast_skill is not None:
         print("canceling skill")
