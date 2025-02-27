@@ -32,10 +32,10 @@ def extract_numbers_from_image(img, scale_factor=9.0):
     height, width, _ = img.shape
     
     # Reduzir a área de captura para 20% da largura e altura
-    x_start = width // 4  # Começo da área central (25% da largura)
-    x_end = 3 * width // 4  # Fim da área central (75% da largura)
-    y_start = height // 4  # Começo da área central (25% da altura)
-    y_end = 3 * height // 4  # Fim da área central (75% da altura)
+    x_start = width // 3  # Começo da área central (25% da largura)
+    x_end = 2 * width // 3  # Fim da área central (75% da largura)
+    y_start = height // 3  # Começo da área central (25% da altura)
+    y_end = 2 * height // 3  # Fim da área central (75% da altura)
 
     # Cortar a região central
     roi = img[y_start:y_end, x_start:x_end]
@@ -66,8 +66,9 @@ def extract_numbers_from_image(img, scale_factor=9.0):
     text = pytesseract.image_to_string(smoothed_img, config=custom_oem_psm_config)
 
     # Regex para capturar números no formato '58:360' (sem os colchetes)
-    regex = r'(\d+)\s*:\s*(\d+)'
+    regex = r'\[\s*(\S+)\s*:\s*(\S+)\]'
 
+    print(text)
     # Usar o regex para encontrar as correspondências
     matches = re.findall(regex, text)
 
@@ -108,9 +109,10 @@ def typing_coordinates(coordinates):
     VK_SPACE = 0x20
 
     where = ' '.join(coordinates[0])
+    where = where.replace("?","7")
+    where = where.replace("S","5")
     print("start typing location: [%s]" % where)
     sleep(2)
-
     # Type the input string
     for char in where:
         print(char)
