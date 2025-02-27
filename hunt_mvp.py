@@ -1,5 +1,6 @@
 import ctypes
 from time import sleep
+import json
 import cv2
 import numpy as np
 from PIL import ImageGrab
@@ -58,8 +59,8 @@ def extract_numbers_from_image(img, scale_factor=9.0):
     smoothed_img = cv2.GaussianBlur(contrast_img, (3, 3), 0)
 
     # Salvar a imagem processada para análise
-    cv2.imwrite(output_file, smoothed_img)
-    print(f'Imagem processada salva como: {output_file}')
+    # cv2.imwrite(output_file, smoothed_img)
+    # print(f'Imagem processada salva como: {output_file}')
 
     # Usar pytesseract para extrair o texto da imagem
     custom_oem_psm_config = '--oem 3 --psm 6'  # PSM 6: Assume uma única linha de texto, OEM 3: Melhor modelo OCR
@@ -90,7 +91,7 @@ def capture_active_window():
     # Capturar a imagem da janela ativa
     img = ImageGrab.grab(bbox=(left, top, right, bottom))  # bbox define a área da captura
     
-    img.save(filename)
+    # img.save(filename)
 
     return img
 
@@ -157,22 +158,27 @@ def skill_key():
     ctypes.windll.user32.keybd_event(VK_F3, 0, 0, 0)
     ctypes.windll.user32.keybd_event(VK_F3, 0, 2, 0)
 
-def teleport():
-    ctypes.windll.user32.keybd_event(VK_ALT, 0, 0, 0)
-    sleep(0.2)
-    ctypes.windll.user32.keybd_event(VK_1, 0, 0, 0)
-    sleep(0.2)
-    ctypes.windll.user32.keybd_event(VK_1, 0, 2, 0)
-    ctypes.windll.user32.keybd_event(VK_ALT, 0, 2, 0)
+def teleport(warp):
+    pyautogui.write(f"@warp {warp}")
+    # Press Enter
+    ctypes.windll.user32.keybd_event(VK_RETURN, 0, 0, 0)
+    ctypes.windll.user32.keybd_event(VK_RETURN, 0, 2, 0)
+    # ctypes.windll.user32.keybd_event(VK_ALT, 0, 0, 0)
+    # sleep(0.2)
+    # ctypes.windll.user32.keybd_event(VK_1, 0, 0, 0)
+    # sleep(0.2)
+    # ctypes.windll.user32.keybd_event(VK_1, 0, 2, 0)
+    # ctypes.windll.user32.keybd_event(VK_ALT, 0, 2, 0)
 
-def teleport_with_location(coordinates):
-    ctypes.windll.user32.keybd_event(VK_CONTROL, 0, 0, 0)
-    sleep(0.2)
-    ctypes.windll.user32.keybd_event(VK_V, 0, 0, 0)
-    sleep(0.2)
-    ctypes.windll.user32.keybd_event(VK_CONTROL, 0, 2, 0)
-    ctypes.windll.user32.keybd_event(VK_V, 0, 2, 0)
+def teleport_with_location(warp, coordinates):
+    # ctypes.windll.user32.keybd_event(VK_CONTROL, 0, 0, 0)
+    # sleep(0.2)
+    # ctypes.windll.user32.keybd_event(VK_V, 0, 0, 0)
+    # sleep(0.2)
+    # ctypes.windll.user32.keybd_event(VK_CONTROL, 0, 2, 0)
+    # ctypes.windll.user32.keybd_event(VK_V, 0, 2, 0)
 
+    pyautogui.write(f"@warp {warp} ")
     typing_coordinates(coordinates)
     sleep(0.5)
 
@@ -181,13 +187,18 @@ def teleport_with_location(coordinates):
     ctypes.windll.user32.keybd_event(VK_RETURN, 0, 2, 0)
 
 
-def mobsearch():
-    ctypes.windll.user32.keybd_event(VK_ALT, 0, 0, 0)
-    sleep(0.2)
-    ctypes.windll.user32.keybd_event(VK_8, 0, 0, 0)
-    sleep(0.2)
-    ctypes.windll.user32.keybd_event(VK_8, 0, 2, 0)
-    ctypes.windll.user32.keybd_event(VK_ALT, 0, 2, 0)
+def mobsearch(id):
+    pyautogui.write(f"@mobsearch {id}")
+    sleep(0.5)
+    # Press Enter
+    ctypes.windll.user32.keybd_event(VK_RETURN, 0, 0, 0)
+    ctypes.windll.user32.keybd_event(VK_RETURN, 0, 2, 0)
+    # ctypes.windll.user32.keybd_event(VK_ALT, 0, 0, 0)
+    # sleep(0.2)
+    # ctypes.windll.user32.keybd_event(VK_8, 0, 0, 0)
+    # sleep(0.2)
+    # ctypes.windll.user32.keybd_event(VK_8, 0, 2, 0)
+    # ctypes.windll.user32.keybd_event(VK_ALT, 0, 2, 0)
 
 
 def mvp_is_dead(reference_img):
@@ -223,32 +234,51 @@ game_region = (0, 0, 1440, 900)
 # define the image to search for on the screen
 mvp_dead = cv2.imread('mvp_dead.png')
 
+mvps = {}
+with open('mvps.json', 'r') as file:
+    mvps = json.load(file)  # Carrega o conteúdo do JSON
+
 sleep(3)
 while True:    
 
-    teleport()
-    sleep(0.2)
-    # run command to check if MvP is alive
-    mobsearch()
-    sleep(0.2)
+    for warp, mobid in mvps.items():
+        print(f"Indo para o mapa {warp} pegar o {mobid}...")
+        teleport(warp)
+        sleep(0.7)
+        # run command to check if MvP is alive
+        mobsearch(mobid)
+        sleep(0.2)
 
-    if  mvp_is_dead(mvp_dead) is False:
-        print("MvP vivo!")
-        img = capture_active_window()
-        img_array = np.array(img)
-        location = extract_numbers_from_image(img_array)
-        # Exibir o texto extraído (para análise)
-        print("mobsearch extraido:", location)
-        if location:
-            teleport_with_location(location)
-            sleep(0.6)
-            skill_key()
-            sleep(0.1)
-            left_click()
-            sleep(2)
-            skill_key()
-            sleep(0.1)
-            left_click()
+        while  mvp_is_dead(mvp_dead) is False:
+            print("MvP vivo!")
+            teleport(warp)
+            mobsearch(mobid)
             sleep(0.2)
-    else:
-        print("MvP morto! esperando respawn...")
+            img = capture_active_window()
+            img_array = np.array(img)
+            location = extract_numbers_from_image(img_array)
+            # Exibir o texto extraído (para análise)
+            print("mobsearch extraido:", location)
+            if location:
+                teleport_with_location(warp, location)
+                sleep(0.6)
+                skill_key()
+                sleep(0.1)
+                left_click()
+                sleep(2)
+                skill_key()
+                sleep(0.1)
+                left_click()
+                sleep(0.2)
+        
+        print("MvP morto! indo para o proximo...")
+
+
+# {
+#     "yuno_fild03": 1582,
+#     "prt_sewb4": 1086,
+#     "pay_fild04": 1582,
+#     "ayo_dun02": 1688,
+#     "beach_dun": 1583,
+#     "tur_dun04": 1312
+# }
