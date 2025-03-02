@@ -1,5 +1,6 @@
 import ctypes
 from time import sleep
+import datetime
 import json
 import cv2
 import numpy as np
@@ -69,7 +70,6 @@ def extract_numbers_from_image(img, scale_factor=9.0):
     # Regex para capturar números no formato '58:360' (sem os colchetes)
     regex = r'\[\s*(\S+)\s*:\s*(\S+)\]'
 
-    print(text)
     # Usar o regex para encontrar as correspondências
     matches = re.findall(regex, text)
 
@@ -112,7 +112,6 @@ def typing_coordinates(coordinates):
     where = ' '.join(coordinates[0])
     where = where.replace("?","7")
     where = where.replace("S","5")
-    print("start typing location: [%s]" % where)
     sleep(2)
     # Type the input string
     for char in where:
@@ -143,7 +142,6 @@ def typing_coordinates(coordinates):
         # Press the key
         ctypes.windll.user32.keybd_event(key_code, 0, 0, 0)
         ctypes.windll.user32.keybd_event(key_code, 0, 2, 0)
-    print("done typing")
 
 
 def left_click():
@@ -242,15 +240,13 @@ sleep(3)
 while True:    
 
     for warp, mobid in mvps.items():
-        print(f"Indo para o mapa {warp} pegar o {mobid}...")
         teleport(warp)
         sleep(0.7)
         # run command to check if MvP is alive
         mobsearch(mobid)
-        sleep(0.2)
+        sleep(0.3)
 
         while  mvp_is_dead(mvp_dead) is False:
-            print("MvP vivo!")
             teleport(warp)
             mobsearch(mobid)
             sleep(0.2)
@@ -258,8 +254,8 @@ while True:
             img_array = np.array(img)
             location = extract_numbers_from_image(img_array)
             # Exibir o texto extraído (para análise)
-            print("mobsearch extraido:", location)
             if location:
+                print(f'{mobid} esta vivo em {warp} {location}! Hora: {datetime.datetime.now()}')
                 teleport_with_location(warp, location)
                 sleep(0.6)
                 skill_key()
@@ -269,9 +265,13 @@ while True:
                 skill_key()
                 sleep(0.1)
                 left_click()
+                sleep(2)
+                skill_key()
+                sleep(0.1)
+                left_click()
                 sleep(0.2)
-        
-        print("MvP morto! indo para o proximo...")
+
+        sleep(1)
 
 
 # {
