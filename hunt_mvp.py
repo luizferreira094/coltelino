@@ -234,6 +234,13 @@ def mobsearch(id):
     # ctypes.windll.user32.keybd_event(VK_8, 0, 2, 0)
     # ctypes.windll.user32.keybd_event(VK_ALT, 0, 2, 0)
 
+def refresh():
+    pyautogui.write(f"@refresh")
+    sleep(0.5)
+    # Press Enter
+    ctypes.windll.user32.keybd_event(VK_RETURN, 0, 0, 0)
+    ctypes.windll.user32.keybd_event(VK_RETURN, 0, 2, 0)
+    sleep(1)
 
 def mvp_is_dead(reference_img):
     # Capturar a janela ativa
@@ -276,6 +283,23 @@ def check_coordinates():
     #     training_model(processed_image, "failed")
     return extraction
 
+# Função para verificar se os números da tupla t2 estão dentro de ±10 de t1
+def dentro_do_intervalo(t1, t2, margem=10):
+    for num1, num2 in zip(t1, t2):
+        if not (int(num1) - margem <= int(num2) <= int(num1) + margem):
+            return False
+    return True
+
+def nearby(location):
+    new_location = check_coordinates()
+    print(f"location: {location} new location: {new_location}")
+    for t1, t2 in zip(location, new_location):
+        if dentro_do_intervalo(t1, t2):
+            return 1
+        else:
+            return 0
+
+
 # set up tesseract OCR engine
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"
 
@@ -311,6 +335,6 @@ while True:
                     if location != check_coordinates():
                         print("MvP telou, pegando nova coordenada")
                         location_not_changed = 0
-            teleport(warp)
+            refresh()
         sleep(1)
 
