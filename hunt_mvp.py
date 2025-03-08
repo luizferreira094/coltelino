@@ -9,6 +9,9 @@ import pygetwindow as gw
 import pyautogui
 import pytesseract
 import re
+import os
+import uuid
+import subprocess
 
 # Define constants for the mouse events
 MOUSE_LEFTDOWN = 0x02
@@ -28,16 +31,17 @@ ctypes.windll.user32.mouse_event.argtypes = [ctypes.c_long, ctypes.c_long, ctype
 
 
 def extract_numbers_from_image(img, scale_factor=9.0):
-    output_file = 'captura_janela_ativa.png'
-    
     # Obter as dimensões da imagem
     height, width, _ = img.shape
     
-    # Reduzir a área de captura para 20% da largura e altura
-    x_start = width // 3  # Começo da área central (25% da largura)
-    x_end = 2 * width // 3  # Fim da área central (75% da largura)
-    y_start = height // 3  # Começo da área central (25% da altura)
-    y_end = 2 * height // 3  # Fim da área central (75% da altura)
+    # Definir a porcentagem da largura e altura para a ROI
+    roi_percentage = 0.20  # 20% da largura e altura
+
+    # Calcular as coordenadas da ROI centralizada
+    x_start = int((width * (1 - roi_percentage)) / 2)
+    x_end = int((width * (1 + roi_percentage)) / 2)
+    y_start = int((height * (1 - roi_percentage)) / 2)
+    y_end = int((height * (1 + roi_percentage)) / 2)
 
     # Cortar a região central
     roi = img[y_start:y_end, x_start:x_end]
@@ -51,7 +55,7 @@ def extract_numbers_from_image(img, scale_factor=9.0):
     gray = cv2.cvtColor(resized_img, cv2.COLOR_BGR2GRAY)
     
     # Usando Thresholding binário inverso para destacar o texto branco em fundo preto
-    _, thresholded = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)  # Inverter cores
+    _, thresholded = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
 
     # Aumentar o contraste da imagem para destacar ainda mais o texto
     contrast_img = cv2.convertScaleAbs(thresholded, alpha=1.5, beta=0)
@@ -59,12 +63,8 @@ def extract_numbers_from_image(img, scale_factor=9.0):
     # Aplicar uma leve suavização (GaussianBlur) para reduzir o ruído
     smoothed_img = cv2.GaussianBlur(contrast_img, (3, 3), 0)
 
-    # Salvar a imagem processada para análise
-    # cv2.imwrite(output_file, smoothed_img)
-    # print(f'Imagem processada salva como: {output_file}')
-
     # Usar pytesseract para extrair o texto da imagem
-    custom_oem_psm_config = '--oem 3 --psm 6'  # PSM 6: Assume uma única linha de texto, OEM 3: Melhor modelo OCR
+    custom_oem_psm_config = '--oem 1 --psm 6'  # PSM 6: Assume uma única linha de texto, OEM 1: Modelo OCR LSTM
     text = pytesseract.image_to_string(smoothed_img, config=custom_oem_psm_config)
 
     # Regex para capturar números no formato '58:360' (sem os colchetes)
@@ -73,7 +73,7 @@ def extract_numbers_from_image(img, scale_factor=9.0):
     # Usar o regex para encontrar as correspondências
     matches = re.findall(regex, text)
 
-    return matches
+    return smoothed_img, matches
 
 
 def capture_active_window():
@@ -143,6 +143,40 @@ def typing_coordinates(coordinates):
         ctypes.windll.user32.keybd_event(key_code, 0, 0, 0)
         ctypes.windll.user32.keybd_event(key_code, 0, 2, 0)
 
+def generate_training_file(img_path, img_name):
+    """Gera os arquivos necessários para o treinamento do Tesseract."""
+    
+    # Gerar o arquivo .box primeiro (Tesseract precisa dele para treinar)
+    cmd_box = f"tesseract {img_path} {img_name} batch.nochop makebox"
+    subprocess.run(cmd_box, shell=True)
+    
+    # Agora, gerar o arquivo .tr
+    cmd_train = f"tesseract {img_path} {img_name} nobatch box.train"
+    subprocess.run(cmd_train, shell=True)
+
+    print(f"Arquivos .box e .tr criados para: {img_name}")
+
+def training_model(img, status):
+    """Salva a imagem na pasta correta e gera os arquivos de treinamento."""
+    IMAGES_DIR = "image-training"
+    SUCCESS_DIR = os.path.join(IMAGES_DIR, "success")
+    FAILED_DIR = os.path.join(IMAGES_DIR, "failed")
+
+    # Criar diretórios, se não existirem
+    os.makedirs(SUCCESS_DIR, exist_ok=True)
+    os.makedirs(FAILED_DIR, exist_ok=True)
+
+    # Gera um identificador único para o nome do arquivo
+    unique_id = uuid.uuid4().hex
+    img_filename = f"{unique_id}.tif"  # Arquivo de imagem deve ser .tif para o Tesseract
+    img_path = os.path.join(SUCCESS_DIR if status == "success" else FAILED_DIR, img_filename)
+
+    # Salva a imagem na pasta correspondente
+    cv2.imwrite(img_path, img)
+    print(f"Imagem salva em: {img_path}")
+
+    # Gera o arquivo de treinamento
+    generate_training_file(img_path, img_path.replace(".tif", ""))  # Passa o caminho correto
 
 def left_click():
     # press left mouse button down
@@ -158,6 +192,7 @@ def skill_key():
 
 def teleport(warp):
     pyautogui.write(f"@warp {warp}")
+    sleep(0.5)
     # Press Enter
     ctypes.windll.user32.keybd_event(VK_RETURN, 0, 0, 0)
     ctypes.windll.user32.keybd_event(VK_RETURN, 0, 2, 0)
@@ -191,6 +226,7 @@ def mobsearch(id):
     # Press Enter
     ctypes.windll.user32.keybd_event(VK_RETURN, 0, 0, 0)
     ctypes.windll.user32.keybd_event(VK_RETURN, 0, 2, 0)
+    sleep(1)
     # ctypes.windll.user32.keybd_event(VK_ALT, 0, 0, 0)
     # sleep(0.2)
     # ctypes.windll.user32.keybd_event(VK_8, 0, 0, 0)
@@ -224,6 +260,22 @@ def mvp_is_dead(reference_img):
     # Retornar True se a correspondência for maior ou igual ao limiar
     return max_val >= threshold
 
+def use_skill():
+    skill_key()
+    sleep(0.1)
+    left_click()
+
+def check_coordinates():
+    mobsearch(mobid)
+    img = capture_active_window()
+    img_array = np.array(img)
+    processed_image, extraction = extract_numbers_from_image(img_array)
+    # if extraction:
+    #     training_model(processed_image, "success")
+    # else:
+    #     training_model(processed_image, "failed")
+    return extraction
+
 # set up tesseract OCR engine
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"
 
@@ -238,47 +290,27 @@ with open('mvps.json', 'r') as file:
 
 sleep(3)
 while True:    
-
     for warp, mobid in mvps.items():
         teleport(warp)
-        sleep(0.7)
+        sleep(1)
         # run command to check if MvP is alive
         mobsearch(mobid)
-        sleep(0.3)
-
-        while  mvp_is_dead(mvp_dead) is False:
-            teleport(warp)
-            mobsearch(mobid)
-            sleep(0.2)
-            img = capture_active_window()
-            img_array = np.array(img)
-            location = extract_numbers_from_image(img_array)
+        while mvp_is_dead(mvp_dead) is False:
+            location = check_coordinates()
+            print(location)
             # Exibir o texto extraído (para análise)
             if location:
+                location_not_changed = 1
                 print(f'{mobid} esta vivo em {warp} {location}! Hora: {datetime.datetime.now()}')
-                teleport_with_location(warp, location)
-                sleep(0.6)
-                skill_key()
-                sleep(0.1)
-                left_click()
-                sleep(2)
-                skill_key()
-                sleep(0.1)
-                left_click()
-                sleep(2)
-                skill_key()
-                sleep(0.1)
-                left_click()
-                sleep(0.2)
-
+                while location_not_changed:
+                    teleport_with_location(warp, location)
+                    sleep(0.6)
+                    for i in range(0, 5):
+                        use_skill()
+                        sleep(2)
+                    if location != check_coordinates():
+                        print("MvP telou, pegando nova coordenada")
+                        location_not_changed = 0
+            teleport(warp)
         sleep(1)
 
-
-# {
-#     "yuno_fild03": 1582,
-#     "prt_sewb4": 1086,
-#     "pay_fild04": 1582,
-#     "ayo_dun02": 1688,
-#     "beach_dun": 1583,
-#     "tur_dun04": 1312
-# }
