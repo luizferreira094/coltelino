@@ -324,17 +324,24 @@ while True:
             print(location)
             # Exibir o texto extraído (para análise)
             if location:
-                location_not_changed = 1
                 print(f'{mobid} esta vivo em {warp} {location}! Hora: {datetime.datetime.now()}')
-                while location_not_changed:
-                    teleport_with_location(warp, location)
-                    sleep(0.6)
-                    for i in range(0, 5):
-                        use_skill()
-                        sleep(2)
-                    if location != check_coordinates():
-                        print("MvP telou, pegando nova coordenada")
-                        location_not_changed = 0
-            refresh()
+                teleport_with_location(warp, location)
+                sleep(0.6)
+                for i in range(0, 3):
+                    use_skill()
+                    sleep(2)
+            teleport(warp)
+            #     location_not_changed = 1
+            #     print(f'{mobid} esta vivo em {warp} {location}! Hora: {datetime.datetime.now()}')
+            #     while location_not_changed:
+            #         teleport_with_location(warp, location)
+            #         sleep(0.6)
+            #         for i in range(0, 5):
+            #             use_skill()
+            #             sleep(2)
+            #         if location != check_coordinates():
+            #             print("MvP telou, pegando nova coordenada")
+            #             location_not_changed = 0
+            # refresh()
         sleep(1)
 
