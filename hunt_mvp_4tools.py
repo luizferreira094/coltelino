@@ -112,7 +112,7 @@ def typing_coordinates(coordinates):
     where = ' '.join(coordinates[0])
     where = where.replace("?","7")
     where = where.replace("S","5")
-    sleep(2)
+
     # Type the input string
     for char in where:
         print(char)
@@ -188,6 +188,7 @@ def left_click():
 def skill_key():
     # Call the keyboard_event function to simulate F3
     ctypes.windll.user32.keybd_event(VK_F3, 0, 0, 0)
+    sleep(10)
     ctypes.windll.user32.keybd_event(VK_F3, 0, 2, 0)
 
 def teleport(warp):
@@ -269,8 +270,8 @@ def mvp_is_dead(reference_img):
 
 def use_skill():
     skill_key()
-    sleep(0.1)
-    left_click()
+    # sleep(0.1)
+    # left_click()
 
 def apenas_numeros(lista):
     for tupla in lista:
@@ -284,6 +285,7 @@ def check_coordinates():
     img = capture_active_window()
     img_array = np.array(img)
     processed_image, extraction = extract_numbers_from_image(img_array)
+    # extraction = sanitize(extraction)
     print(extraction)
     if apenas_numeros(extraction):
         return extraction
@@ -338,21 +340,14 @@ while True:
             print(location)
             # Exibir o texto extraído (para análise)
             if location:
-                # print(f'{mobid} esta vivo em {warp} {location}! Hora: {datetime.datetime.now()}')
-                # teleport_with_location(warp, location)
-                # sleep(0.6)
-            #     for i in range(0, 3):
-            #         use_skill()
-            #         sleep(2)
-            # teleport(warp)
                 location_not_changed = 1
                 print(f'{mobid} esta vivo em {warp} {location}! Hora: {datetime.datetime.now()}')
                 while location_not_changed:
                     teleport_with_location(warp, location)
                     sleep(0.6)
-                    for i in range(0, 5):
+                    for i in range(0, 1):
                         use_skill()
-                        sleep(2)
+                        sleep(1)
                     if not nearby(location):
                         print("MvP telou, pegando nova coordenada")
                         location_not_changed = 0
