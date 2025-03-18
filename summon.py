@@ -38,6 +38,8 @@ dead_button = cv2.imread('dead_OK.png')
 # define the image to search for on the screen
 dillema_screen = cv2.imread('dillema.png')
 
+# define the image to search for on the screen
+esconderijo_flag = cv2.imread('esconderijo.png')
 
 # # define the image to search for on the screen
 # coma_img = cv2.imread('coma.png')
@@ -76,6 +78,7 @@ while True:
     portal_skill = pyautogui.locateOnScreen(popup_portal, confidence=0.5)
     dead_popup = pyautogui.locateOnScreen(dead_screen, confidence=0.8)
     dillema_skill = pyautogui.locateOnScreen(dillema_screen, confidence=0.8)
+    esconderijo_skill = pyautogui.locateOnScreen(esconderijo_flag, confidence=0.8)
     # coma_skill = pyautogui.locateOnScreen(coma_img, confidence=0.8)
 
     if summon_skill is not None:
@@ -146,6 +149,9 @@ while True:
         ctypes.windll.user32.keybd_event(VK_F5, 0, 2, 0)
 
     if dillema_skill is not None:
+        teleport()
+
+    if esconderijo_skill is not None:
         teleport()
 
     # Press Enter
