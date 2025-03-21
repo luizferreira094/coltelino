@@ -25,6 +25,7 @@ KEY_CODES.update({' ': 0x20})
 
 # Configuração do Tesseract
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"
+os.environ["TESSDATA_PREFIX"] = r"C:\Program Files (x86)\Tesseract-OCR\tessdata"
 
 def press_key(key_code, hold_time=0.1):
     """Simula o pressionamento de uma tecla."""
@@ -54,7 +55,7 @@ def extract_numbers_from_image(img, scale_factor=9.0):
     gray = cv2.cvtColor(resized_img, cv2.COLOR_BGR2GRAY)
     _, thresholded = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
     smoothed_img = cv2.GaussianBlur(cv2.convertScaleAbs(thresholded, alpha=1.5, beta=0), (3, 3), 0)
-    text = pytesseract.image_to_string(smoothed_img, config='--oem 1 --psm 6')
+    text = pytesseract.image_to_string(smoothed_img, config='--oem 1 --psm 6 -c tessedit_char_whitelist=\"0123456789:., []\"')
     return smoothed_img, re.findall(r'\[\s*(\S+)\s*:\s*(\S+)\]', text)
 
 def type_coordinates(coordinates):
@@ -96,6 +97,7 @@ def check_coordinates(mobid):
     if img:
         processed_image, extraction = extract_numbers_from_image(np.array(img))
         print(extraction)
+        # save_training_image(processed_image, "success" if extraction else "failed")
         return extraction
 
 def nearby(location):
@@ -104,13 +106,10 @@ def nearby(location):
     return any(abs(int(t1) - int(t2)) <= 10 for t1, t2 in zip(location, new_location)) if new_location else False
 
 def mvp_is_dead(reference_img):
-    """Verifica se o MVP está morto comparando imagens."""
-    active_window_img = capture_active_window()
-    if active_window_img:
-        img_bgr = cv2.cvtColor(np.array(active_window_img), cv2.COLOR_RGB2BGR)
-        result = cv2.matchTemplate(cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY), cv2.cvtColor(reference_img, cv2.COLOR_BGR2GRAY), cv2.TM_CCOEFF_NORMED)
-        return cv2.minMaxLoc(result)[1] >= 0.8
-    return False
+    if pyautogui.locateOnScreen(reference_img, confidence=0.8) is not None:
+        return True 
+    else:
+        return False
 
 def main():
     """Loop principal do script."""
@@ -130,9 +129,11 @@ def main():
                     print(f'{mobid} está vivo em {warp} {location}! Hora: {datetime.now()}')
                     teleport(warp, location)
                     sleep(0.6)
-                    press_key(VK_F3, 10)
+                    press_key(VK_F3, 20)
                     sleep(1)
-                pyautogui.write("@refresh")
+                teleport(warp)
+                sleep(0.3)
+                pyautogui.write(f"@mobsearch {mobid}")
                 press_key(VK_RETURN)
                 sleep(1)
 

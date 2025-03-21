@@ -41,11 +41,16 @@ dillema_screen = cv2.imread('dillema.png')
 # define the image to search for on the screen
 esconderijo_flag = cv2.imread('esconderijo.png')
 
+# define the image to search for on the screen
+invocar_monstro_img = cv2.imread('invocar_monstro.png')
+
 # # define the image to search for on the screen
 # coma_img = cv2.imread('coma.png')
 
 
 def teleport():
+    global use_dead_branch
+    use_dead_branch = True
     ctypes.windll.user32.keybd_event(VK_ALT, 0, 0, 0)
     time.sleep(0.2)
     ctypes.windll.user32.keybd_event(VK_1, 0, 0, 0)
@@ -64,6 +69,7 @@ def cursor_center():
 
 # define the wait variable for waiting press button
 wait = False
+use_dead_branch = True
 
 time.sleep(5)
 
@@ -79,20 +85,22 @@ while True:
     dead_popup = pyautogui.locateOnScreen(dead_screen, confidence=0.8)
     dillema_skill = pyautogui.locateOnScreen(dillema_screen, confidence=0.8)
     esconderijo_skill = pyautogui.locateOnScreen(esconderijo_flag, confidence=0.8)
+    invocar_monstro_skill = pyautogui.locateOnScreen(invocar_monstro_img, confidence=0.5)
     # coma_skill = pyautogui.locateOnScreen(coma_img, confidence=0.8)
 
     if summon_skill is not None:
         print("Summon Time! Good Luck!")
         # Press F2
-        ctypes.windll.user32.keybd_event(VK_F2, 0, 0, 0)
-        ctypes.windll.user32.keybd_event(VK_F2, 0, 2, 0) 
-        time.sleep(0.5)
+
+        if use_dead_branch:
+            ctypes.windll.user32.keybd_event(VK_F2, 0, 0, 0)
+            ctypes.windll.user32.keybd_event(VK_F2, 0, 2, 0) 
+            time.sleep(0.5)
         # press left mouse button down
         ctypes.windll.user32.mouse_event(MOUSE_LEFTDOWN, 0, 0, 0, 0)
         time.sleep(0.1)
         # release left mouse button up
         ctypes.windll.user32.mouse_event(MOUSE_LEFTUP, 0, 0, 0, 0)
-
         teleport()
         # MANUAL SUMMONING - NOT ERASE
         # wait = True
@@ -153,6 +161,11 @@ while True:
 
     if esconderijo_skill is not None:
         teleport()
+
+    if invocar_monstro_skill is not None:
+        print("invocado monstro pela skill")
+        use_dead_branch = False
+
 
     # Press Enter
     ctypes.windll.user32.keybd_event(VK_F3, 0, 0, 0)
