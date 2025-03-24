@@ -1,167 +1,203 @@
-import ctypes
+import pyautogui
 import cv2
 import numpy as np
-import pyautogui
-import pytesseract
 import time
+import ctypes
+import random
+from datetime import datetime
+import pygetwindow as gw
 
 
 # Define the key codes for Enter
-VK_RETURN = 0x0D
+VK_F3 = 0x72
+VK_F4 = 0x73
+MOUSE_LEFTDOWN = 0x02
+MOUSE_LEFTUP = 0x04
+MOUSE_RIGHTDOWN = 0x08
+MOUSE_RIGHTTUP = 0x10
+VK_ALT = 0x12
+VK_1 = 0x31
+VK_4 = 0x34
+VK_5 = 0X35
 
-# os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials.json'
-
-def extract_red_colours(image):
-    # Convert the image to the HSV color space
-    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-
-    # Define the lower and upper bounds of the red color
-    lower_red = np.array([0, 50, 50])
-    upper_red = np.array([10, 255, 255])
-
-    # Threshold the HSV image to get only red colors
-    mask = cv2.inRange(hsv, lower_red, upper_red)
-
-    # Find contours of the red regions
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    # Iterate through the contours and extract the bounding boxes
-    for contour in contours:
-        (x, y, w, h) = cv2.boundingRect(contour)
-        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-    return image
-
-
-def extract_ocr(image):
-    return pytesseract.image_to_string(image)
-    """Detects text in the file."""
-    # client = vision.ImageAnnotatorClient()
-
-    # with io.open("processed_image_number.jpg", 'rb') as image_file:
-    #     content = image_file.read()
-
-    # image = vision.Image(content=content)
-
-    # response = client.text_detection(image=image)
-    # texts = response.text_annotations
-
-    # print(texts[1].description)
-    # return texts[1].description
-
-
-def game_event(code):
-    # Define the key codes for the numbers
-    VK_0 = 0x30
-    VK_1 = 0x31
-    VK_2 = 0x32
-    VK_3 = 0x33
-    VK_4 = 0x34
-    VK_5 = 0x35
-    VK_6 = 0x36
-    VK_7 = 0x37
-    VK_8 = 0x38
-    VK_9 = 0x39
-
-    code_string = ''.join(filter(str.isdigit, code))
-    code_string = code_string.replace("S","5")
-    print("start typing code: [%s]" % code_string)
-    time.sleep(2)
-
-    # Type the input string
-    for char in code_string:
-        print(char)
-        # Convert the character to the corresponding key code
-        if char == '0':
-            key_code = VK_0
-        elif char == '1':
-            key_code = VK_1
-        elif char == '2':
-            key_code = VK_2
-        elif char == '3':
-            key_code = VK_3
-        elif char == '4':
-            key_code = VK_4
-        elif char == '5':
-            key_code = VK_5
-        elif char == '6':
-            key_code = VK_6
-        elif char == '7':
-            key_code = VK_7
-        elif char == '8':
-            key_code = VK_8
-        elif char == '9':
-            key_code = VK_9
-        # Press the key
-        ctypes.windll.user32.keybd_event(key_code, 0, 0, 0)
-        ctypes.windll.user32.keybd_event(key_code, 0, 2, 0)
-    print("done typing")
-    time.sleep(2)
-    # Press Enter
-    ctypes.windll.user32.keybd_event(VK_RETURN, 0, 0, 0)
-    ctypes.windll.user32.keybd_event(VK_RETURN, 0, 2, 0)
-
-    # # Press Enter
-    # ctypes.windll.user32.keybd_event(VK_RETURN, 0, 0, 0)
-    # ctypes.windll.user32.keybd_event(VK_RETURN, 0, 2, 0)
-
-# set up tesseract OCR engine
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"
+SCREEN_LEFT = 0
+SCREEN_TOP = 0
+SCREEN_WIDTH = 0
+SCREEN_HEIGHT = 0
 
 # define the region of the game window to capture
-game_region = (0, 0, 1360, 768)
-
-# define the region of the popup window to capture
-#popup_region = (300, 200, 500, 300)
-popup_region = (0, 0, 1360, 768)
+# game_region = (0, 0, 1360, 768)
 
 # define the image to search for on the screen
-popup_image = cv2.imread('BotInput.JPG')
+weight = cv2.imread('90_peso.png')
 
-while True:
-    # take a screenshot of the game window
-    game_screenshot = pyautogui.screenshot(region=game_region)
+# define the image to search for on the screen
+sell_icon = cv2.imread('sell_icon.png')
 
-    # search for the popup window on the screenshot
-    popup_location = pyautogui.locateOnScreen(popup_image, confidence=0.5)
+# define the image to search for on the screen
+sell_list = cv2.imread('sell_list.png')
 
-    if popup_location is not None:
+# define the image to search for on the screen
+sell_list_empty = cv2.imread('sell_list_empty.png')
 
-        print("Press enter after anti-bot initialized")
+# # define the image to search for on the screen
+# obb_img = cv2.imread('obb.png')
 
-        # Press Enter
-        ctypes.windll.user32.keybd_event(VK_RETURN, 0, 0, 0)
-        ctypes.windll.user32.keybd_event(VK_RETURN, 0, 2, 0)
+# # define the image to search for on the screen
+# galho_seco_img = cv2.imread('galho_seco.png')
 
-        time.sleep(1)
+# define the image to search for on the screen
+ygg_img = cv2.imread('ygg.png')
 
-        # take a screenshot of the popup window
-        popup_screenshot = pyautogui.screenshot(region=popup_location)
 
-        # convert the screenshot to a numpy array
-        popup_np = np.array(popup_screenshot)
+storage_close_button_img = cv2.imread('close_storage_button.png')
+# # define the image to search for on the screen
+# coma_img = cv2.imread('coma.png')
 
-        # red_extracted = extract_red_colours(popup_np)
 
-        cv2.imwrite('processed_image.jpg', popup_np)
+def teleport(key):
+    ctypes.windll.user32.keybd_event(VK_ALT, 0, 0, 0)
+    time.sleep(0.2)
+    ctypes.windll.user32.keybd_event(key, 0, 0, 0)
+    time.sleep(0.2)
+    ctypes.windll.user32.keybd_event(key, 0, 2, 0)
+    ctypes.windll.user32.keybd_event(VK_ALT, 0, 2, 0)
 
-        # gray = cv2.cvtColor(popup_np, cv2.COLOR_BGR2GRAY)
+def left_click():
+    # press left mouse button down
+    ctypes.windll.user32.mouse_event(MOUSE_LEFTDOWN, 0, 0, 0, 0)
+    time.sleep(0.1)
+    # release left mouse button up
+    ctypes.windll.user32.mouse_event(MOUSE_LEFTUP, 0, 0, 0, 0)
 
-        lower_red = np.array([60, 0, 0])
-        upper_red = np.array([255, 0, 0])
+def skill_key():
+    # Call the keyboard_event function to simulate F3
+    ctypes.windll.user32.keybd_event(VK_F3, 0, 0, 0)
+    ctypes.windll.user32.keybd_event(VK_F3, 0, 2, 0)
 
-        # Threshold the image to extract the red color
-        red = cv2.inRange(popup_np, lower_red, upper_red)
+def get_coordinates_from_item(item):
+    x, y = pyautogui.center(item)
+    x, y = int(x), int(y)
+    return x, y
 
-        resize = cv2.resize(red, None, fx=15, fy=15, interpolation=cv2.INTER_CUBIC)
-
-        cv2.imwrite('processed_image_number.jpg', resize)
-
-        red_text = extract_ocr(resize)
-
-        # Print the extracted text
-        print(red_text)
-
-        game_event(red_text)
-
-    # wait for 1 second before taking the next screenshot
+def send_storage(x, y):
+    ctypes.windll.user32.SetCursorPos(x, y)
     time.sleep(1)
+    # click ctrl
+    ctypes.windll.user32.keybd_event(VK_ALT, 0, 0, 0)
+    time.sleep(0.3)
+    # press right mouse button down
+    ctypes.windll.user32.mouse_event(MOUSE_RIGHTDOWN, 0, 0, 0, 0)
+    time.sleep(0.1)
+    # release right mouse button up
+    ctypes.windll.user32.mouse_event(MOUSE_RIGHTTUP, 0, 0, 0, 0)
+    # release ctrl
+    ctypes.windll.user32.keybd_event(VK_ALT, 0, 2, 0)
+
+def open_storage():
+    ctypes.windll.user32.keybd_event(VK_ALT, 0, 0, 0)
+    time.sleep(0.2)
+    ctypes.windll.user32.keybd_event(VK_4, 0, 0, 0)
+    time.sleep(0.2)
+    ctypes.windll.user32.keybd_event(VK_4, 0, 2, 0)
+    ctypes.windll.user32.keybd_event(VK_ALT, 0, 2, 0)    
+
+def close_storage():
+    storage_button = pyautogui.locateOnScreen(storage_close_button_img, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.8)
+    x, y = get_coordinates_from_item(storage_button)
+    ctypes.windll.user32.SetCursorPos(x, y)
+    time.sleep(0.3)
+    left_click()
+
+def cursor_center(randomLocation=True):
+    # Calcula o centro da janela
+    center_x = SCREEN_LEFT + SCREEN_WIDTH // 2
+    center_y = SCREEN_TOP + SCREEN_HEIGHT // 2
+
+    if randomLocation:
+        random_x = random.randint(10, 50)
+        random_y = random.randint(10, 50)
+        # Move o mouse de volta para o centro da tela
+        ctypes.windll.user32.SetCursorPos(center_x+random_x, center_y+random_y)
+    else:
+        ctypes.windll.user32.SetCursorPos(center_x, center_y)
+
+
+def sell():
+    sell_items = pyautogui.locateOnScreen(sell_list, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.8)
+    x, y = get_coordinates_from_item(sell_items)
+    ctypes.windll.user32.SetCursorPos(x, y+20)
+     # Call the keyboard_event function to simulate F4
+    ctypes.windll.user32.keybd_event(VK_F4, 0, 0, 0)
+    time.sleep(6)
+    ctypes.windll.user32.keybd_event(VK_F4, 0, 2, 0)
+
+def sell_other_items():
+    teleport(VK_5)
+    time.sleep(1)
+    left_click()
+    time.sleep(0.3)
+    sell_button = pyautogui.locateOnScreen(sell_icon, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.8)
+    x, y = get_coordinates_from_item(sell_button)
+    ctypes.windll.user32.SetCursorPos(x, y)
+    time.sleep(0.3)
+    left_click()
+    time.sleep(0.3)
+    sell()
+
+    sell_button = pyautogui.locateOnScreen(sell_icon, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.8)
+    x, y = get_coordinates_from_item(sell_button)
+    ctypes.windll.user32.SetCursorPos(x, y)
+    time.sleep(0.3)
+    left_click()
+    time.sleep(0.3)
+    cursor_center(randomLocation=False)
+    print(f"venda realizada!  Hora: {datetime.now()}")
+
+
+
+time.sleep(5)
+
+
+active_window = gw.getActiveWindow()
+# Verifica se a janela ativa foi encontrada
+if active_window:
+    # Obtém as coordenadas (x, y) e o tamanho (largura, altura) da janela ativa
+    SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT = active_window.left, active_window.top, active_window.width, active_window.height
+
+    while True:
+        # search for the popup window on the screenshot
+        weight_heavy = pyautogui.locateOnScreen(weight, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.97)
+
+        if weight_heavy is not None:
+            # obb_item = pyautogui.locateOnScreen(obb_img, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.5)
+            # gs_item = pyautogui.locateOnScreen(galho_seco_img, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.5)
+            ygg_item = pyautogui.locateOnScreen(ygg_img, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.6)
+
+            open_storage()
+            
+            # if obb_item:
+            #     obb_location_x, obb_location_y = get_coordinates_from_item(obb_item)
+            #     send_storage(obb_location_x, obb_location_y)
+            # if gs_item:
+            #     gs_location_x, gs_location_y = get_coordinates_from_item(gs_item)
+            #     send_storage(gs_location_x, gs_location_y)
+            if ygg_item:
+                ygg_location_x, ygg_location_y = get_coordinates_from_item(ygg_item)
+                send_storage(ygg_location_x, ygg_location_y)
+            time.sleep(0.3)
+            close_storage()
+            time.sleep(0.2)
+            cursor_center(randomLocation=False)
+            time.sleep(0.4)
+            sell_other_items()
+        
+        cursor_center()
+        skill_key()
+        left_click()
+        teleport(VK_1)
+        time.sleep(2)
+
+else:
+    print("Nenhuma janela ativa encontrada.")    
+
