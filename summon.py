@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import time
 import ctypes
+import pygetwindow as gw
 
 
 # Define the key codes for Enter
@@ -16,6 +17,11 @@ MOUSE_LEFTDOWN = 0x02
 MOUSE_LEFTUP = 0x04
 VK_ALT = 0x12
 VK_1 = 0x31
+
+SCREEN_LEFT = 0
+SCREEN_TOP = 0
+SCREEN_WIDTH = 0
+SCREEN_HEIGHT = 0
 
 # define the region of the game window to capture
 # game_region = (0, 0, 1360, 768)
@@ -59,11 +65,10 @@ def teleport():
     ctypes.windll.user32.keybd_event(VK_ALT, 0, 2, 0)
 
 def cursor_center():
-    # Obtém o tamanho da tela
-    screen_width, screen_height = pyautogui.size()
-    center_x, center_y = screen_width // 2, screen_height // 2
+    # Calcula o centro da janela
+    center_x = SCREEN_LEFT + SCREEN_WIDTH // 2
+    center_y = SCREEN_TOP + SCREEN_HEIGHT // 2
 
-    # Move o mouse de volta para o centro da tela
     ctypes.windll.user32.SetCursorPos(center_x, center_y)
     print("Mouse voltou ao centro da tela!")
 
@@ -73,103 +78,111 @@ use_dead_branch = True
 
 time.sleep(5)
 
-while True:
-    # take a screenshot of the game window
-    # game_screenshot = pyautogui.screenshot(region=game_region)
-    game_screenshot = pyautogui.screenshot()
 
-    # search for the popup window on the screenshot
-    summon_skill = pyautogui.locateOnScreen(popup_skill, confidence=0.5)
-    cast_skill = pyautogui.locateOnScreen(popup_cast, confidence=0.5)
-    portal_skill = pyautogui.locateOnScreen(popup_portal, confidence=0.5)
-    dead_popup = pyautogui.locateOnScreen(dead_screen, confidence=0.8)
-    dillema_skill = pyautogui.locateOnScreen(dillema_screen, confidence=0.8)
-    esconderijo_skill = pyautogui.locateOnScreen(esconderijo_flag, confidence=0.8)
-    invocar_monstro_skill = pyautogui.locateOnScreen(invocar_monstro_img, confidence=0.5)
-    # coma_skill = pyautogui.locateOnScreen(coma_img, confidence=0.8)
+active_window = gw.getActiveWindow()
+# Verifica se a janela ativa foi encontrada
 
-    if summon_skill is not None:
-        print("Summon Time! Good Luck!")
-        # Press F2
+if active_window:
+    # Obtém as coordenadas (x, y) e o tamanho (largura, altura) da janela ativa
+    SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT = active_window.left, active_window.top, active_window.width, active_window.height
 
-        if use_dead_branch:
-            ctypes.windll.user32.keybd_event(VK_F2, 0, 0, 0)
-            ctypes.windll.user32.keybd_event(VK_F2, 0, 2, 0) 
-            time.sleep(0.5)
-        # press left mouse button down
-        ctypes.windll.user32.mouse_event(MOUSE_LEFTDOWN, 0, 0, 0, 0)
-        time.sleep(0.1)
-        # release left mouse button up
-        ctypes.windll.user32.mouse_event(MOUSE_LEFTUP, 0, 0, 0, 0)
-        teleport()
-        # MANUAL SUMMONING - NOT ERASE
-        # wait = True
-        # while (wait):
-        #     time.sleep(0.1)
-        #     if pyautogui.locateOnScreen(popup_skill, confidence=0.5) is None:
-        #         wait = False
+    while True:
+        # search for the popup window on the screenshot
+        summon_skill = pyautogui.locateOnScreen(popup_skill, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.5)
+        cast_skill = pyautogui.locateOnScreen(popup_cast, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.5)
+        portal_skill = pyautogui.locateOnScreen(popup_portal, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.5)
+        dead_popup = pyautogui.locateOnScreen(dead_screen, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.8)
+        dillema_skill = pyautogui.locateOnScreen(dillema_screen, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.8)
+        esconderijo_skill = pyautogui.locateOnScreen(esconderijo_flag, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.8)
+        invocar_monstro_skill = pyautogui.locateOnScreen(invocar_monstro_img, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.5)
+        # coma_skill = pyautogui.locateOnScreen(coma_img, confidence=0.8)
 
-    if portal_skill is not None:
-        print("Canceling portal popup")
-        # Press down arrow 2x
-        ctypes.windll.user32.keybd_event(VK_DOWN, 0, 0, 0)
-        ctypes.windll.user32.keybd_event(VK_DOWN, 0, 2, 0)      
+        if summon_skill is not None:
+            print("Summon Time! Good Luck!")
+            # Press F2
 
-        ctypes.windll.user32.keybd_event(VK_DOWN, 0, 0, 0)
-        ctypes.windll.user32.keybd_event(VK_DOWN, 0, 2, 0)      
-        time.sleep(0.5)
-        # Press Enter
-        ctypes.windll.user32.keybd_event(VK_RETURN, 0, 0, 0)
-        ctypes.windll.user32.keybd_event(VK_RETURN, 0, 2, 0)    
-
-    if dead_popup is not None:
-        x, y = pyautogui.center(dead_popup)
-        x, y = int(x), int(y)
-        ctypes.windll.user32.SetCursorPos(x, y)
-        time.sleep(0.2)
-        # press left mouse button down
-        ctypes.windll.user32.mouse_event(MOUSE_LEFTDOWN, 0, 0, 0, 0)
-        time.sleep(0.1)
-        # release left mouse button up
-        ctypes.windll.user32.mouse_event(MOUSE_LEFTUP, 0, 0, 0, 0)
-        time.sleep(0.5)
-        ok_button = pyautogui.locateOnScreen(dead_button, confidence=0.8)
-        time.sleep(0.5)
-        if ok_button:
-            x, y = pyautogui.center(ok_button)
-            x, y = int(x), int(y)
-            ctypes.windll.user32.SetCursorPos(x, y)
-            time.sleep(0.1)
+            if use_dead_branch:
+                ctypes.windll.user32.keybd_event(VK_F2, 0, 0, 0)
+                ctypes.windll.user32.keybd_event(VK_F2, 0, 2, 0) 
+                time.sleep(0.5)
             # press left mouse button down
             ctypes.windll.user32.mouse_event(MOUSE_LEFTDOWN, 0, 0, 0, 0)
             time.sleep(0.1)
             # release left mouse button up
             ctypes.windll.user32.mouse_event(MOUSE_LEFTUP, 0, 0, 0, 0)
-            
-        time.sleep(2)
-        cursor_center()
-        teleport()
+            teleport()
+            # MANUAL SUMMONING - NOT ERASE
+            # wait = True
+            # while (wait):
+            #     time.sleep(0.1)
+            #     if pyautogui.locateOnScreen(popup_skill, confidence=0.5) is None:
+            #         wait = False
 
-    if cast_skill is not None:
-        print("canceling skill")
+        if portal_skill is not None:
+            print("Canceling portal popup")
+            # Press down arrow 2x
+            ctypes.windll.user32.keybd_event(VK_DOWN, 0, 0, 0)
+            ctypes.windll.user32.keybd_event(VK_DOWN, 0, 2, 0)      
+
+            ctypes.windll.user32.keybd_event(VK_DOWN, 0, 0, 0)
+            ctypes.windll.user32.keybd_event(VK_DOWN, 0, 2, 0)      
+            time.sleep(0.5)
+            # Press Enter
+            ctypes.windll.user32.keybd_event(VK_RETURN, 0, 0, 0)
+            ctypes.windll.user32.keybd_event(VK_RETURN, 0, 2, 0)    
+
+        if dead_popup is not None:
+            x, y = pyautogui.center(dead_popup)
+            x, y = int(x), int(y)
+            ctypes.windll.user32.SetCursorPos(x, y)
+            time.sleep(0.2)
+            # press left mouse button down
+            ctypes.windll.user32.mouse_event(MOUSE_LEFTDOWN, 0, 0, 0, 0)
+            time.sleep(0.1)
+            # release left mouse button up
+            ctypes.windll.user32.mouse_event(MOUSE_LEFTUP, 0, 0, 0, 0)
+            time.sleep(0.5)
+            ok_button = pyautogui.locateOnScreen(dead_button, confidence=0.8)
+            time.sleep(0.5)
+            if ok_button:
+                x, y = pyautogui.center(ok_button)
+                x, y = int(x), int(y)
+                ctypes.windll.user32.SetCursorPos(x, y)
+                time.sleep(0.1)
+                # press left mouse button down
+                ctypes.windll.user32.mouse_event(MOUSE_LEFTDOWN, 0, 0, 0, 0)
+                time.sleep(0.1)
+                # release left mouse button up
+                ctypes.windll.user32.mouse_event(MOUSE_LEFTUP, 0, 0, 0, 0)
+                
+            time.sleep(2)
+            cursor_center()
+            teleport()
+
+        if cast_skill is not None:
+            print("canceling skill")
+            # Press Enter
+            ctypes.windll.user32.keybd_event(VK_F5, 0, 0, 0)
+            ctypes.windll.user32.keybd_event(VK_F5, 0, 2, 0)
+
+        if dillema_skill is not None:
+            teleport()
+
+        if esconderijo_skill is not None:
+            teleport()
+
+        if invocar_monstro_skill is not None:
+            print("invocado monstro pela skill")
+            use_dead_branch = False
+
+
         # Press Enter
-        ctypes.windll.user32.keybd_event(VK_F5, 0, 0, 0)
-        ctypes.windll.user32.keybd_event(VK_F5, 0, 2, 0)
+        ctypes.windll.user32.keybd_event(VK_F3, 0, 0, 0)
+        ctypes.windll.user32.keybd_event(VK_F3, 0, 2, 0)
 
-    if dillema_skill is not None:
-        teleport()
-
-    if esconderijo_skill is not None:
-        teleport()
-
-    if invocar_monstro_skill is not None:
-        print("invocado monstro pela skill")
-        use_dead_branch = False
+        # wait for 1 second before taking the next screenshot
+        time.sleep(0.1)
+else:
+    print("Nenhuma janela ativa encontrada.")    
 
 
-    # Press Enter
-    ctypes.windll.user32.keybd_event(VK_F3, 0, 0, 0)
-    ctypes.windll.user32.keybd_event(VK_F3, 0, 2, 0)
-
-    # wait for 1 second before taking the next screenshot
-    time.sleep(0.1)

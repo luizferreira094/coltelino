@@ -70,9 +70,9 @@ def generate_training_file(img_path, img_name):
     subprocess.run(f"tesseract {img_path} {img_name} batch.nochop makebox", shell=True)
     subprocess.run(f"tesseract {img_path} {img_name} nobatch box.train", shell=True)
 
-def save_training_image(img, status):
+def save_training_image(img):
     """Salva a imagem na pasta correspondente e gera arquivos de treinamento."""
-    base_dir = os.path.join("image-training", "success" if status == "success" else "failed")
+    base_dir = os.path.join("image-training", "curated_files")
     os.makedirs(base_dir, exist_ok=True)
     img_path = os.path.join(base_dir, f"{uuid.uuid4().hex}.tif")
     cv2.imwrite(img_path, img)
@@ -97,7 +97,7 @@ def check_coordinates(mobid):
     if img:
         processed_image, extraction = extract_numbers_from_image(np.array(img))
         print(extraction)
-        # save_training_image(processed_image, "success" if extraction else "failed")
+        # save_training_image(processed_image)
         return extraction
 
 def nearby(location):
