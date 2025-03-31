@@ -50,6 +50,8 @@ esconderijo_flag = cv2.imread('esconderijo.png')
 # define the image to search for on the screen
 invocar_monstro_img = cv2.imread('invocar_monstro.png')
 
+# define the image to search for on the screen
+id_item_list_img = cv2.imread('id_item_list.png')
 # # define the image to search for on the screen
 # coma_img = cv2.imread('coma.png')
 
@@ -95,6 +97,7 @@ if active_window:
         dillema_skill = pyautogui.locateOnScreen(dillema_screen, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.8)
         esconderijo_skill = pyautogui.locateOnScreen(esconderijo_flag, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.8)
         invocar_monstro_skill = pyautogui.locateOnScreen(invocar_monstro_img, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.5)
+        id_item_list_popup = pyautogui.locateOnScreen(id_item_list_img, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.8)
         # coma_skill = pyautogui.locateOnScreen(coma_img, confidence=0.8)
 
         if summon_skill is not None:
@@ -175,6 +178,8 @@ if active_window:
             print("invocado monstro pela skill")
             use_dead_branch = False
 
+        if id_item_list_popup is not None:
+            teleport()
 
         # Press Enter
         ctypes.windll.user32.keybd_event(VK_F3, 0, 0, 0)

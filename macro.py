@@ -182,4 +182,4 @@ while True:
     sleep(0.2)
     teleport()
 
-    sleep(0.3)
+    sleep(1.7)
