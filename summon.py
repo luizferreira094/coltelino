@@ -91,15 +91,7 @@ if active_window:
     while True:
         # search for the popup window on the screenshot
         summon_skill = pyautogui.locateOnScreen(popup_skill, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.5)
-        cast_skill = pyautogui.locateOnScreen(popup_cast, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.5)
-        portal_skill = pyautogui.locateOnScreen(popup_portal, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.5)
-        dead_popup = pyautogui.locateOnScreen(dead_screen, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.8)
-        dillema_skill = pyautogui.locateOnScreen(dillema_screen, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.8)
-        esconderijo_skill = pyautogui.locateOnScreen(esconderijo_flag, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.8)
-        invocar_monstro_skill = pyautogui.locateOnScreen(invocar_monstro_img, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.5)
-        id_item_list_popup = pyautogui.locateOnScreen(id_item_list_img, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.8)
-        # coma_skill = pyautogui.locateOnScreen(coma_img, confidence=0.8)
-
+               
         if summon_skill is not None:
             print("Summon Time! Good Luck!")
             # Press F2
@@ -120,7 +112,21 @@ if active_window:
             #     time.sleep(0.1)
             #     if pyautogui.locateOnScreen(popup_skill, confidence=0.5) is None:
             #         wait = False
+        
+        # Press F5
+        ctypes.windll.user32.keybd_event(VK_F5, 0, 0, 0)
+        ctypes.windll.user32.keybd_event(VK_F5, 0, 2, 0)
 
+
+        portal_skill = pyautogui.locateOnScreen(popup_portal, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.5)
+        dead_popup = pyautogui.locateOnScreen(dead_screen, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.8)
+        dillema_skill = pyautogui.locateOnScreen(dillema_screen, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.8)
+        esconderijo_skill = pyautogui.locateOnScreen(esconderijo_flag, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.8)
+        invocar_monstro_skill = pyautogui.locateOnScreen(invocar_monstro_img, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.5)
+        id_item_list_popup = pyautogui.locateOnScreen(id_item_list_img, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.8)
+        # coma_skill = pyautogui.locateOnScreen(coma_img, confidence=0.8)
+
+       
         if portal_skill is not None:
             print("Canceling portal popup")
             # Press down arrow 2x
@@ -162,11 +168,6 @@ if active_window:
             cursor_center()
             teleport()
 
-        if cast_skill is not None:
-            print("canceling skill")
-            # Press Enter
-            ctypes.windll.user32.keybd_event(VK_F5, 0, 0, 0)
-            ctypes.windll.user32.keybd_event(VK_F5, 0, 2, 0)
 
         if dillema_skill is not None:
             teleport()
@@ -186,7 +187,7 @@ if active_window:
         ctypes.windll.user32.keybd_event(VK_F3, 0, 2, 0)
 
         # wait for 1 second before taking the next screenshot
-        time.sleep(0.1)
+        time.sleep(0.5)
 else:
     print("Nenhuma janela ativa encontrada.")    
 
