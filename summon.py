@@ -105,6 +105,7 @@ if active_window:
             time.sleep(0.1)
             # release left mouse button up
             ctypes.windll.user32.mouse_event(MOUSE_LEFTUP, 0, 0, 0, 0)
+            time.sleep(0.2)
             teleport()
             # MANUAL SUMMONING - NOT ERASE
             # wait = True

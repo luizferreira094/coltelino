@@ -180,7 +180,7 @@ time.sleep(5)
 active_window = gw.getActiveWindow()
 # Verifica se a janela ativa foi encontrada
 
-farmed_items = [ygg_img, box_thunder_img, obb_img]
+farmed_items = [ygg_img, galho_seco_img, box_thunder_img, obb_img]
 
 if active_window:
     # Obtém as coordenadas (x, y) e o tamanho (largura, altura) da janela ativa
@@ -195,7 +195,7 @@ if active_window:
                 teleport(VK_2)
                 time.sleep(0.8)
                 send_items_to_storage(farmed_items)
-                sell_other_items()
+                # sell_other_items()
             cursor_center()
             skill_key()
             left_click()
