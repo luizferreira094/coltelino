@@ -99,7 +99,7 @@ if active_window:
             if use_dead_branch:
                 ctypes.windll.user32.keybd_event(VK_F2, 0, 0, 0)
                 ctypes.windll.user32.keybd_event(VK_F2, 0, 2, 0) 
-                time.sleep(0.5)
+            time.sleep(0.5)
             # press left mouse button down
             ctypes.windll.user32.mouse_event(MOUSE_LEFTDOWN, 0, 0, 0, 0)
             time.sleep(0.1)
@@ -164,7 +164,7 @@ if active_window:
                 # release left mouse button up
                 ctypes.windll.user32.mouse_event(MOUSE_LEFTUP, 0, 0, 0, 0)
                 
-            time.sleep(2)
+            time.sleep(8)
             cursor_center()
             teleport()
 
