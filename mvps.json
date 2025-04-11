@@ -1,5 +1,9 @@
 {
-    "yuno_fild03": 1582,
-    "prt_sewb4": 1086,
-    "pay_fild04": 1582
+    "prt_sewb4": [1086],
+    "yuno_fild03": [1582],
+    "pay_fild04": [1582],
+    "lou_dun03": [1630],
+    "beach_dun": [1583],
+    "ayo_dun02": [1688],
+    "tur_dun04": [1312]
 }
