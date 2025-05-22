@@ -53,17 +53,34 @@ def capture_active_window():
         return None
     return ImageGrab.grab(bbox=(active_window.left, active_window.top, active_window.right, active_window.bottom))
 
-def extract_numbers_from_image(img, scale_factor=9.0):
-    """Extrai números da imagem usando OCR."""
+def extract_numbers_from_image(img, scale_factor=3.0):
+    """Extrai coordenadas e nome de monstro da imagem do Ragnarok."""
     height, width, _ = img.shape
-    roi = img[int(height*0.4):int(height*0.6), int(width*0.4):int(width*0.6)]
-    resized_img = cv2.resize(roi, None, fx=scale_factor, fy=scale_factor)
+
+    # Corta uma área centralizada onde aparece o nome do monstro
+    top = height // 2 - 80
+    bottom = height // 2 - 30
+    left = width // 2 - 120
+    right = width // 2 + 120
+
+    roi = img[top:bottom, left:right]
+
+    if roi.size == 0:
+        raise ValueError("ROI vazio! Verifique as coordenadas do recorte.")
+
+    resized_img = cv2.resize(roi, None, fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_CUBIC)
     gray = cv2.cvtColor(resized_img, cv2.COLOR_BGR2GRAY)
-    _, thresholded = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
-    smoothed_img = cv2.GaussianBlur(cv2.convertScaleAbs(thresholded, alpha=1.5, beta=0), (3, 3), 0)
-    text = pytesseract.image_to_string(smoothed_img, config='--oem 1 --psm 6 -c tessedit_char_whitelist=\"0123456789:., []\"')
-    print("extracted text: "+text)
-    return smoothed_img, re.findall(r'\[\s*(\S+)\s*:\s*(\S+)\]', text)
+    _, thresholded = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY)
+    smoothed_img = cv2.GaussianBlur(thresholded, (3, 3), 0)
+
+    custom_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist="0123456789: []"'
+    text = pytesseract.image_to_string(smoothed_img, config=custom_config)
+    print("Texto extraído:", text)
+
+    cv2.imwrite("roi_image.png", smoothed_img)
+
+    matches = re.findall(r'\[(\d+):(\d+)\]', text)
+    return smoothed_img, matches
 
 def type_coordinates(coordinates):
     """Digita as coordenadas corrigindo possíveis erros de OCR."""
