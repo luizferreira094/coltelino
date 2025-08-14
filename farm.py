@@ -54,6 +54,12 @@ def skill_key():
     ctypes.windll.user32.keybd_event(VK_F3, 0, 0, 0)
     ctypes.windll.user32.keybd_event(VK_F3, 0, 2, 0)
 
+def sell_press():
+    ctypes.windll.user32.keybd_event(VK_F4, 0, 0, 0)
+    time.sleep(30)
+    ctypes.windll.user32.keybd_event(VK_F4, 0, 2, 0)
+    
+
 def get_coordinates_from_item(item):
     x, y = pyautogui.center(item)
     return int(x), int(y)
@@ -100,12 +106,8 @@ def sell():
     if sell_items:
         x, y = get_coordinates_from_item(sell_items)
         ctypes.windll.user32.SetCursorPos(x, y + 20)
-        for i in range(100):
-            ctypes.windll.user32.mouse_event(MOUSE_LEFTDOWN, 0, 0, 0, 0)
-            ctypes.windll.user32.mouse_event(MOUSE_LEFTUP,   0, 0, 0, 0)
-            ctypes.windll.user32.mouse_event(MOUSE_LEFTDOWN, 0, 0, 0, 0)
-            ctypes.windll.user32.mouse_event(MOUSE_LEFTUP,   0, 0, 0, 0)   
-            time.sleep(0.1)
+        time.sleep(0.4)
+        sell_press()
 
 
 def sell_other_items():
@@ -168,7 +170,7 @@ try:
                 weight_heavy = pyautogui.locateOnScreen(weight, region=(SCREEN_LEFT, SCREEN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT), confidence=0.8)
                 if weight_heavy is not None:
                     send_items_to_storage(farmed_items)
-                    # sell_other_items()
+                    sell_other_items()
                 cursor_center()
                 skill_key()
                 left_click()
